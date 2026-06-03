@@ -53,7 +53,7 @@ Por isso, foi desenvolvido um sistema capaz de transformar informações técnic
 
 <div align="center">
 
-<img src="INSERIR_PRINT_DO_WOKWI_AQUI" width="850">
+<img src="astranode-print.png" width="850">
 
 ### 📡 Circuito desenvolvido no Wokwi utilizando Arduino UNO, LCD, LEDs, Buzzer e Sensores Simulados
 
