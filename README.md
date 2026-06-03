@@ -7,6 +7,7 @@
 <img src="https://img.shields.io/badge/Arduino-Edge%20Computing-blue?style=for-the-badge&logo=arduino">
 <img src="https://img.shields.io/badge/FIAP-Global%20Solution-red?style=for-the-badge">
 <img src="https://img.shields.io/badge/Wokwi-Simulation-0096FF?style=for-the-badge">
+<img src="https://img.shields.io/badge/Status-Funcionando-success?style=for-the-badge">
 <img src="https://img.shields.io/badge/IoT-Connected-success?style=for-the-badge">
 
 </div>
@@ -17,35 +18,31 @@
 
 Imagine uma comunidade rural que depende integralmente de internet via satélite para realizar atividades essenciais como aulas remotas, telemedicina, agricultura digital e acesso a serviços públicos.
 
-Quando ocorrem falhas de conectividade, muitas vezes não existem ferramentas simples que permitam identificar rapidamente o problema e auxiliar na tomada de decisão.
+Quando ocorrem falhas de conectividade, muitas vezes não existem ferramentas simples que permitam identificar rapidamente o problema, entender o nível de criticidade da rede e apoiar a tomada de decisão.
 
 O **AstraNode** foi desenvolvido para simular uma estação inteligente de monitoramento de conectividade via satélite, capaz de acompanhar a qualidade da conexão, identificar situações críticas, gerar alertas e auxiliar na priorização de serviços essenciais.
 
-O projeto faz parte da solução **AstraLink**, plataforma criada para apoiar a gestão da conectividade em comunidades remotas.
+O projeto faz parte da solução **AstraLink**, uma plataforma criada para apoiar a gestão da conectividade em comunidades remotas.
 
 ---
 
 # ❗ Por que isso é importante?
 
-A conectividade é um fator essencial para o desenvolvimento social e econômico de regiões afastadas.
+A conectividade é um fator essencial para o desenvolvimento social, econômico e educacional de regiões afastadas.
 
 Falhas de comunicação podem impactar diretamente:
 
 <div align="center">
 
 🏫 Educação
-
 🏥 Saúde
-
 🌾 Agricultura
-
 🌎 Inclusão Digital
-
 📡 Comunicação de Emergência
 
 </div>
 
-Por isso, foi desenvolvido um sistema capaz de transformar informações técnicas de conectividade em alertas simples e acionáveis.
+Por isso, foi desenvolvido um sistema capaz de transformar dados técnicos de conectividade em alertas simples, visuais e acionáveis.
 
 ---
 
@@ -55,7 +52,7 @@ Por isso, foi desenvolvido um sistema capaz de transformar informações técnic
 
 <img src="astranode-print.png" width="850">
 
-### 📡 Circuito desenvolvido no Wokwi utilizando Arduino UNO, LCD, LEDs, Buzzer e Sensores Simulados
+### 📡 Circuito desenvolvido no Wokwi utilizando Arduino UNO, LCD, LEDs, Buzzer, Botão e Sensores Simulados
 
 </div>
 
@@ -63,9 +60,9 @@ Por isso, foi desenvolvido um sistema capaz de transformar informações técnic
 
 # 🎯 Objetivo da Solução
 
-O AstraNode tem como objetivo monitorar condições de conectividade em comunidades remotas conectadas via satélite, permitindo identificar falhas, gerar alertas e auxiliar gestores na priorização de recursos críticos.
+O **AstraNode** tem como objetivo monitorar condições de conectividade em comunidades remotas conectadas via satélite, permitindo identificar falhas, gerar alertas e auxiliar gestores na priorização de recursos críticos.
 
-A solução busca demonstrar como tecnologias de Edge Computing podem apoiar a gestão da infraestrutura digital em regiões que dependem de comunicações espaciais.
+A solução demonstra como tecnologias de **Edge Computing** podem apoiar a gestão da infraestrutura digital em regiões que dependem de comunicações espaciais.
 
 ---
 
@@ -213,6 +210,27 @@ Permite alternar entre as prioridades operacionais monitoradas pelo sistema.
 
 ---
 
+# 🔌 Estrutura do Circuito
+
+<div align="center">
+
+| Componente                | Pino no Arduino |
+| ------------------------- | --------------- |
+| LCD I2C - SDA             | A4              |
+| LCD I2C - SCL             | A5              |
+| Potenciômetro do Sinal    | A0              |
+| Potenciômetro de Usuários | A1              |
+| LED Verde                 | D8              |
+| LED Amarelo               | D9              |
+| LED Vermelho              | D10             |
+| LED Laranja               | D11             |
+| Buzzer                    | D6              |
+| Push Button               | D2              |
+
+</div>
+
+---
+
 # 🚨 Funcionamento do Sistema
 
 ## 📡 Qualidade da Conexão
@@ -266,18 +284,353 @@ O Arduino toma decisões automaticamente utilizando lógica condicional e proces
 
 ---
 
+# 💻 Código Fonte
+
+O código completo do projeto está disponível no arquivo principal do repositório e também pode ser visualizado abaixo.
+
+```cpp
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+// LEDs
+const int ledVerde = 8;
+const int ledAmarelo = 9;
+const int ledVermelho = 10;
+const int ledPrioridade = 11;
+
+// Buzzer
+const int buzzer = 6;
+
+// Botão
+const int botao = 2;
+
+// Potenciômetros
+const int sinalPin = A0;
+const int usuariosPin = A1;
+
+// Prioridades
+String prioridades[] = {
+  "ESCOLA",
+  "SAUDE",
+  "AGRICULTURA",
+  "GERAL"
+};
+
+int prioridadeAtual = 3;
+
+// Comunidades
+String comunidades[] = {
+  "SERRA AZUL",
+  "VALE VERDE",
+  "BOA VISTA",
+  "FAZENDA SOL"
+};
+
+int comunidadeAtual = 0;
+
+// Controle de tempo
+unsigned long ultimaTrocaComunidade = 0;
+unsigned long ultimoEventoSolar = 0;
+unsigned long ultimoClique = 0;
+
+const unsigned long intervaloComunidade = 15000;
+const unsigned long intervaloEventoSolar = 30000;
+const unsigned long duracaoEventoSolar = 8000;
+
+bool eventoSolarAtivo = false;
+unsigned long inicioEventoSolar = 0;
+
+bool ultimoEstadoBotao = HIGH;
+
+// Estatísticas
+int incidentes = 0;
+bool estavaCritico = false;
+
+int leiturasTotais = 0;
+int leiturasBoas = 0;
+
+void setup() {
+  pinMode(ledVerde, OUTPUT);
+  pinMode(ledAmarelo, OUTPUT);
+  pinMode(ledVermelho, OUTPUT);
+  pinMode(ledPrioridade, OUTPUT);
+  pinMode(buzzer, OUTPUT);
+  pinMode(botao, INPUT_PULLUP);
+
+  lcd.init();
+  lcd.backlight();
+
+  lcd.setCursor(0, 0);
+  lcd.print("ASTRALINK");
+  lcd.setCursor(0, 1);
+  lcd.print("AstraNode v5");
+
+  delay(2500);
+  lcd.clear();
+}
+
+void loop() {
+  int sinalRaw = analogRead(sinalPin);
+  int usuariosRaw = analogRead(usuariosPin);
+
+  int sinal = map(sinalRaw, 0, 1023, 0, 100);
+  int usuarios = map(usuariosRaw, 0, 1023, 0, 100);
+
+  verificarBotao();
+  trocarComunidadeAutomaticamente();
+  controlarEventoSolar();
+
+  int indice = calcularIndice(sinal, usuarios);
+
+  if (eventoSolarAtivo) {
+    indice -= 20;
+    if (indice < 0) indice = 0;
+  }
+
+  int limiteVerde = getLimiteVerde();
+  int limiteAmarelo = getLimiteAmarelo();
+
+  desligarIndicadores();
+
+  leiturasTotais++;
+
+  if (indice >= limiteVerde) {
+    leiturasBoas++;
+    estavaCritico = false;
+    redeEstavel(sinal, usuarios, indice);
+  } 
+  else if (indice >= limiteAmarelo) {
+    estavaCritico = false;
+    redeInstavel(sinal, usuarios, indice);
+  } 
+  else {
+    if (!estavaCritico) {
+      incidentes++;
+      estavaCritico = true;
+    }
+    redeCritica(sinal, usuarios, indice);
+  }
+
+  delay(300);
+}
+
+void verificarBotao() {
+  bool estadoBotao = digitalRead(botao);
+
+  if (estadoBotao == LOW &&
+      ultimoEstadoBotao == HIGH &&
+      millis() - ultimoClique > 300) {
+
+    prioridadeAtual++;
+
+    if (prioridadeAtual > 3) {
+      prioridadeAtual = 0;
+    }
+
+    ultimoClique = millis();
+
+    digitalWrite(ledPrioridade, HIGH);
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("PRIORIDADE:");
+    lcd.setCursor(0, 1);
+    lcd.print(prioridades[prioridadeAtual]);
+
+    tone(buzzer, 1500, 120);
+
+    delay(1200);
+  }
+
+  ultimoEstadoBotao = estadoBotao;
+}
+
+void trocarComunidadeAutomaticamente() {
+  if (millis() - ultimaTrocaComunidade >= intervaloComunidade) {
+    comunidadeAtual++;
+
+    if (comunidadeAtual > 3) {
+      comunidadeAtual = 0;
+    }
+
+    ultimaTrocaComunidade = millis();
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("COMUNIDADE:");
+    lcd.setCursor(0, 1);
+    lcd.print(comunidades[comunidadeAtual]);
+
+    tone(buzzer, 1200, 100);
+
+    delay(1200);
+  }
+}
+
+void controlarEventoSolar() {
+  if (!eventoSolarAtivo && millis() - ultimoEventoSolar >= intervaloEventoSolar) {
+    eventoSolarAtivo = true;
+    inicioEventoSolar = millis();
+    ultimoEventoSolar = millis();
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("EVENTO SOLAR");
+    lcd.setCursor(0, 1);
+    lcd.print("INTERFERENCIA");
+
+    digitalWrite(ledVermelho, HIGH);
+    tone(buzzer, 700, 700);
+
+    delay(1600);
+  }
+
+  if (eventoSolarAtivo && millis() - inicioEventoSolar >= duracaoEventoSolar) {
+    eventoSolarAtivo = false;
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("EVENTO SOLAR");
+    lcd.setCursor(0, 1);
+    lcd.print("NORMALIZADO");
+
+    tone(buzzer, 1400, 150);
+
+    delay(1200);
+  }
+}
+
+int calcularIndice(int sinal, int usuarios) {
+  int penalidadeUsuarios = usuarios / 2;
+  int indice = sinal - penalidadeUsuarios;
+
+  if (indice < 0) {
+    indice = 0;
+  }
+
+  return indice;
+}
+
+int getLimiteVerde() {
+  switch (prioridadeAtual) {
+    case 0: return 60;
+    case 1: return 80;
+    case 2: return 70;
+    case 3: return 70;
+  }
+
+  return 70;
+}
+
+int getLimiteAmarelo() {
+  switch (prioridadeAtual) {
+    case 0: return 35;
+    case 1: return 60;
+    case 2: return 45;
+    case 3: return 40;
+  }
+
+  return 40;
+}
+
+void desligarIndicadores() {
+  digitalWrite(ledVerde, LOW);
+  digitalWrite(ledAmarelo, LOW);
+  digitalWrite(ledVermelho, LOW);
+  digitalWrite(ledPrioridade, LOW);
+  noTone(buzzer);
+}
+
+void redeEstavel(int sinal, int usuarios, int indice) {
+  digitalWrite(ledVerde, HIGH);
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print(comunidades[comunidadeAtual]);
+
+  lcd.setCursor(0, 1);
+  lcd.print("OK S:");
+  lcd.print(sinal);
+  lcd.print("% U:");
+  lcd.print(usuarios);
+  lcd.print("%");
+}
+
+void redeInstavel(int sinal, int usuarios, int indice) {
+  digitalWrite(ledAmarelo, HIGH);
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print(comunidades[comunidadeAtual]);
+
+  lcd.setCursor(0, 1);
+
+  if (eventoSolarAtivo) {
+    lcd.print("SOLAR ");
+  } else {
+    lcd.print("INST ");
+  }
+
+  lcd.print(prioridades[prioridadeAtual]);
+  lcd.print(" I:");
+  lcd.print(indice);
+}
+
+void redeCritica(int sinal, int usuarios, int indice) {
+  digitalWrite(ledVermelho, HIGH);
+
+  if (eventoSolarAtivo) {
+    tone(buzzer, 700);
+  } else {
+    tone(buzzer, 900);
+  }
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print(comunidades[comunidadeAtual]);
+
+  lcd.setCursor(0, 1);
+  lcd.print("CRIT ");
+
+  if (eventoSolarAtivo) {
+    lcd.print("SOLAR ");
+  } else {
+    lcd.print("INC:");
+    lcd.print(incidentes);
+    lcd.print(" ");
+  }
+
+  lcd.print("I:");
+  lcd.print(indice);
+}
+```
+
+---
+
+# ▶️ Instruções de Execução
+
+Para executar o projeto:
+
+1. Acesse o link da simulação no Wokwi.
+2. Clique no botão **Start Simulation**.
+3. Gire o primeiro potenciômetro para alterar a qualidade do sinal.
+4. Gire o segundo potenciômetro para alterar a quantidade de usuários conectados.
+5. Pressione o botão para alternar entre as prioridades operacionais.
+6. Observe os LEDs, o LCD e o buzzer reagindo automaticamente.
+7. Aguarde a simulação de evento solar ocorrer automaticamente.
+
+---
+
 # 🛠️ Tecnologias Utilizadas
 
 <div align="center">
 
 <img src="https://img.shields.io/badge/Arduino-00979D?style=flat&logo=arduino&logoColor=white">
-
 <img src="https://img.shields.io/badge/Wokwi-0096FF?style=flat">
-
 <img src="https://img.shields.io/badge/C%2B%2B-Language-blue">
-
 <img src="https://img.shields.io/badge/IoT-Internet%20of%20Things-success">
-
 <img src="https://img.shields.io/badge/Edge%20Computing-FIAP-red">
 
 </div>
@@ -304,11 +657,11 @@ COLOCAR_LINK_VIDEO
 
 <div align="center">
 
-| Integrante    | RM |
-| ------------- | -- |
+| Integrante     | RM     |
+| -------------- | ------ |
 | Beatriz Perigo | 569654 |
 | Fabricio Denig | 570980 |
-| Rafael Sobral | 569527 |
+| Rafael Sobral  | 569527 |
 
 </div>
 
@@ -318,7 +671,7 @@ COLOCAR_LINK_VIDEO
 
 Projeto desenvolvido para a **Global Solution 2026** da disciplina de **Edge Computing & Computer Systems** da FIAP.
 
-A solução foi criada com o objetivo de demonstrar a aplicação de conceitos de Edge Computing, IoT e monitoramento inteligente em cenários de conectividade via satélite para comunidades remotas.
+A solução foi criada com o objetivo de demonstrar a aplicação de conceitos de **Edge Computing**, **IoT** e **monitoramento inteligente** em cenários de conectividade via satélite para comunidades remotas.
 
 ---
 
