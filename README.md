@@ -316,7 +316,7 @@ COLOCAR_LINK_VIDEO
 
 # 🏫 Contexto Acadêmico
 
-Projeto desenvolvido para a **Global Solution 2025** da disciplina de **Edge Computing & Computer Systems** da FIAP.
+Projeto desenvolvido para a **Global Solution 2026** da disciplina de **Edge Computing & Computer Systems** da FIAP.
 
 A solução foi criada com o objetivo de demonstrar a aplicação de conceitos de Edge Computing, IoT e monitoramento inteligente em cenários de conectividade via satélite para comunidades remotas.
 
