@@ -7,7 +7,6 @@
 <img src="https://img.shields.io/badge/Arduino-Edge%20Computing-blue?style=for-the-badge&logo=arduino">
 <img src="https://img.shields.io/badge/FIAP-Global%20Solution-red?style=for-the-badge">
 <img src="https://img.shields.io/badge/Wokwi-Simulation-0096FF?style=for-the-badge">
-<img src="https://img.shields.io/badge/Status-Funcionando-success?style=for-the-badge">
 <img src="https://img.shields.io/badge/IoT-Connected-success?style=for-the-badge">
 
 </div>
