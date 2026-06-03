@@ -364,7 +364,7 @@ void setup() {
   lcd.setCursor(0, 0);
   lcd.print("ASTRALINK");
   lcd.setCursor(0, 1);
-  lcd.print("AstraNode v5");
+  lcd.print("AstraNode System");
 
   delay(2500);
   lcd.clear();
@@ -514,10 +514,10 @@ int calcularIndice(int sinal, int usuarios) {
 
 int getLimiteVerde() {
   switch (prioridadeAtual) {
-    case 0: return 60;
-    case 1: return 80;
-    case 2: return 70;
-    case 3: return 70;
+    case 0: return 60; // ESCOLA
+    case 1: return 80; // SAUDE
+    case 2: return 70; // AGRICULTURA
+    case 3: return 70; // GERAL
   }
 
   return 70;
@@ -525,10 +525,10 @@ int getLimiteVerde() {
 
 int getLimiteAmarelo() {
   switch (prioridadeAtual) {
-    case 0: return 35;
-    case 1: return 60;
-    case 2: return 45;
-    case 3: return 40;
+    case 0: return 35; // ESCOLA
+    case 1: return 60; // SAUDE
+    case 2: return 45; // AGRICULTURA
+    case 3: return 40; // GERAL
   }
 
   return 40;
