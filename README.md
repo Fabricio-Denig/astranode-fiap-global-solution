@@ -290,7 +290,7 @@ O Arduino toma decisões automaticamente utilizando lógica condicional e proces
 
 ## 👉 Simulação no Wokwi
 
-COLOCAR_LINK_WOKWI
+https://wokwi.com/projects/465399389626208257
 
 ## 👉 Vídeo Explicativo
 
