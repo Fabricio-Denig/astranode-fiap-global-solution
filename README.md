@@ -658,9 +658,9 @@ COLOCAR_LINK_VIDEO
 
 | Integrante     | RM     |
 | -------------- | ------ |
-| Beatriz Perigo | 569654 |
-| Fabricio Denig | 570980 |
-| Rafael Sobral  | 569527 |
+| Beatriz de Araujo Périgo | 569654 |
+| Fabricio Denig de Avila | 570980 |
+| Rafael Taboada Sobral | 569527 |
 
 </div>
 
