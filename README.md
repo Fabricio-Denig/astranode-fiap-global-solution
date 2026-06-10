@@ -646,7 +646,7 @@ https://wokwi.com/projects/465399389626208257
 
 ## 👉 Vídeo Explicativo
 
-COLOCAR_LINK_VIDEO
+https://youtu.be/q2D4UzMAJmY?si=DcCC_jVwr9aTxSso
 
 </div>
 
